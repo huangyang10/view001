@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家味 - 家庭食谱管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 15px;
+            top: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            position: absolute;
+            right: 15px;
+            top: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-success {
+            background: #2ed573;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            margin: 5px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .card-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: scale(1.05);
+        }
+
+        .dashboard-card .number {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .dashboard-card .label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* List Items */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            background: white;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .list-item-subtitle {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-pending { background: #ffd32a; color: #333; }
+        .badge-ready { background: #2ed573; color: white; }
+        .badge-done { background: #a4b0be; color: white; }
+
+        /* Loading & Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        /* Hidden/Show Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Calendar */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin: 15px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .calendar-day:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .calendar-day.selected {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Recipe Selector */
+        .recipe-selector {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .recipe-option {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .recipe-option:hover {
+            background: #f8f9fa;
+        }
+
+        .recipe-option.selected {
+            background: #e8f0fe;
+            border-left: 4px solid #667eea;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mt-10 { margin-top: 10px; }
+        .mb-10 { margin-bottom: 10px; }
+        .flex { display: flex; gap: 10px; }
+        .hidden { display: none !important; }
+        .text-danger { color: #ff4757; }
+        .text-success { color: #2ed573; }
+        .text-muted { color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- MODALS -->
+
+    <!-- Add Recipe Modal -->
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">添加/编辑菜谱</div>
+            <div class="form-group">
+                <label>菜谱名称</label>
+                <input type="text" id="recipeName" placeholder="如：红烧肉">
+            </div>
+            <div class="form-group">
+                <label>分类</label>
+                <select id="recipeCategory">
+                    <option value="早餐">早餐</option>
+                    <option value="午餐">午餐</option>
+                    <option value="晚餐">晚餐</option>
+                    <option value="甜品">甜品</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>食材（格式：名称:数量:单位，每行一个）</label>
+                <textarea id="recipeIngredients" placeholder="如：&#10;五花肉:500:g&#10;酱油:30:ml"></textarea>
+            </div>
+            <div class="form-group">
+                <label>烹饪步骤（每行一个步骤）</label>
+                <textarea id="recipeSteps" placeholder="如：&#10;1. 切肉&#10;2. 炒糖色"></textarea>
+            </div>
+            <div class="form-group">
+                <label>烹饪时间（分钟）</label>
+                <input type="number" id="recipeTime" placeholder="60">
+            </div>
+            <div class="form-group">
+                <label>难度</label>
+                <select id="recipeDifficulty">
+                    <option value="简单">简单</option>
+                    <option value="中等">中等</option>
+                    <option value="困难">困难</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRecipeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveRecipe()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">今日点餐</div>
+
+            <div class="form-group">
+                <label>选择日期</label>
+                <input type="date" id="orderDate">
+            </div>
+
+            <div class="form-group">
+                <label>餐次</label>
+                <select id="orderType">
+                    <option value="早餐">早餐</option>
+                    <option value="午餐">午餐</option>
+                    <option value="晚餐">晚餐</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>选择菜谱</label>
+                <div id="recipeSelector" class="recipe-selector"></div>
+            </div>
+
+            <div class="form-group">
+                <label>备注</label>
+                <input type="text" id="orderNotes" placeholder="如：少油、少盐">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeOrderModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitOrder()">提交订单</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Login -->
+    <div id="loginPage" class="page active">
+        <div class="header">
+            <h1>👨‍👩‍👧‍👦 家味</h1>
+            <p>家庭食谱与点餐管理</p>
+        </div>
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchAuthTab('login')">登录</div>
+                <div class="tab" onclick="switchAuthTab('register')">注册</div>
+            </div>
+
+            <div id="loginForm">
+                <div class="form-group mt-10">
+                    <label>用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码">
+                </div>
+                <button class="btn btn-primary" onclick="login()">登录</button>
+                <p class="text-center text-muted mt-10">提示：首次使用请注册账号</p>
+            </div>
+
+            <div id="registerForm" class="hidden">
+                <div class="form-group mt-10">
+                    <label>用户名</label>
+                    <input type="text" id="regUsername" placeholder="设置用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="regPassword" placeholder="设置密码">
+                </div>
+                <div class="form-group">
+                    <label>角色</label>
+                    <select id="regRole">
+                        <option value="admin">管理员（创建家庭）</option>
+                        <option value="member">家庭成员</option>
+                    </select>
+                </div>
+                <div class="form-group" id="familyNameGroup">
+                    <label>家庭名称</label>
+                    <input type="text" id="regFamilyName" placeholder="如：王家">
+                </div>
+                <div class="form-group hidden" id="inviteCodeGroup">
+                    <label>邀请码（加入家庭）</label>
+                    <input type="text" id="regInviteCode" placeholder="输入邀请码">
+                </div>
+                <button class="btn btn-primary" onclick="register()">注册</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Dashboard -->
+    <div id="dashboardPage" class="page">
+        <div class="header">
+            <h1 id="familyName">家庭主页</h1>
+            <p id="userName">欢迎回来</p>
+            <button class="logout-btn" onclick="logout()">退出</button>
+        </div>
+        <div class="content">
+            <div class="dashboard-grid">
+                <div class="dashboard-card" onclick="showPage('recipesPage')">
+                    <div>📚</div>
+                    <div class="number" id="recipeCount">0</div>
+                    <div class="label">菜谱总数</div>
+                </div>
+                <div class="dashboard-card" onclick="showPage('ordersPage')">
+                    <div>🍽️</div>
+                    <div class="number" id="orderCount">0</div>
+                    <div class="label">今日订单</div>
+                </div>
+                <div class="dashboard-card" onclick="showPage('recipesPage')">
+                    <div>➕</div>
+                    <div class="number">添加</div>
+                    <div class="label">新菜谱</div>
+                </div>
+                <div class="dashboard-card" onclick="openOrderModal()">
+                    <div>📋</div>
+                    <div class="number">点餐</div>
+                    <div class="label">今日点餐</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🏠 邀请家庭成员</div>
+                <div class="card-content">
+                    <p>邀请码：<strong id="inviteCodeDisplay">-</strong></p>
+                    <p class="text-muted">分享邀请码给家人，让他们加入</p>
+                    <button class="btn btn-secondary btn-small" onclick="copyInviteCode()">复制邀请码</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⏰ 今日概览</div>
+                <div class="card-content" id="todayOverview">
+                    暂无今日订单
+                </div>
+            </div>
+
+            <div class="flex">
+                <button class="btn btn-secondary" onclick="showPage('recipesPage')">管理菜谱</button>
+                <button class="btn btn-secondary" onclick="showPage('ordersPage')">查看订单</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE: Recipes -->
+    <div id="recipesPage" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('dashboardPage')">←</button>
+            <h1>📚 我的菜谱</h1>
+            <button class="logout-btn" onclick="openRecipeModal()">+ 新建</button>
+        </div>
+        <div class="content">
+            <div class="form-group">
+                <input type="text" id="recipeSearch" placeholder="🔍 搜索菜谱..." oninput="filterRecipes()">
+            </div>
+            <div class="form-group">
+                <select id="recipeFilter" onchange="filterRecipes()">
+                    <option value="">全部分类</option>
+                    <option value="早餐">早餐</option>
+                    <option value="午餐">午餐</option>
+                    <option value="晚餐">晚餐</option>
+                    <option value="甜品">甜品</option>
+                </select>
+            </div>
+            <div id="recipeList"></div>
+        </div>
+    </div>
+
+    <!-- PAGE: Orders -->
+    <div id="ordersPage" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="showPage('dashboardPage')">←</button>
+            <h1>🍽️ 点餐订单</h1>
+            <button class="logout-btn" onclick="openOrderModal()">+ 点餐</button>
+        </div>
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" onclick="switchOrderTab('today')">今日</div>
+                <div class="tab" onclick="switchOrderTab('history')">历史</div>
+            </div>
+            <div id="orderList" class="mt-10"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ==================== 数据存储与管理 ====================
+
+// 使用localStorage模拟后端数据库
+const DB = {
+    // 获取当前用户
+    getCurrentUser() {
+        const user = localStorage.getItem('currentUser');
+        return user ? JSON.parse(user) : null;
+    },
+
+    setCurrentUser(user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+    },
+
+    // 用户管理
+    saveUser(user) {
+        const users = this.getUsers();
+        users[user.username] = user;
+        localStorage.setItem('users', JSON.stringify(users));
+    },
+
+    getUsers() {
+        const data = localStorage.getItem('users');
+        return data ? JSON.parse(data) : {};
+    },
+
+    // 家庭管理
+    saveFamily(family) {
+        const families = this.getFamilies();
+        families[family.id] = family;
+        localStorage.setItem('families', JSON.stringify(families));
+    },
+
+    getFamilies() {
+        const data = localStorage.getItem('families');
+        return data ? JSON.parse(data) : {};
+    },
+
+    // 菜谱管理
+    saveRecipe(recipe) {
+        const recipes = this.getRecipes();
+        recipe.id = recipe.id || Date.now().toString();
+        recipe.familyId = this.getCurrentUser().familyId;
+        recipes[recipe.id] = recipe;
+        localStorage.setItem('recipes', JSON.stringify(recipes));
+    },
+
+    getRecipes() {
+        const data = localStorage.getItem('recipes');
+        const allRecipes = data ? JSON.parse(data) : {};
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return {};
+        // 只返回当前家庭的菜谱
+        const familyRecipes = {};
+        for (let id in allRecipes) {
+            if (allRecipes[id].familyId === currentUser.familyId) {
+                familyRecipes[id] = allRecipes[id];
+            }
+        }
+        return familyRecipes;
+    },
+
+    deleteRecipe(id) {
+        const recipes = this.getRecipes();
+        delete recipes[id];
+        localStorage.setItem('recipes', JSON.stringify(recipes));
+    },
+
+    // 订单管理
+    saveOrder(order) {
+        const orders = this.getOrders();
+        order.id = order.id || Date.now().toString();
+        order.userId = this.getCurrentUser().id;
+        order.familyId = this.getCurrentUser().familyId;
+        order.status = 'pending';
+        order.createdAt = new Date().toISOString();
+        orders[order.id] = order;
+        localStorage.setItem('orders', JSON.stringify(orders));
+    },
+
+    getOrders() {
+        const data = localStorage.getItem('orders');
+        const allOrders = data ? JSON.parse(data) : {};
+        const currentUser = this.getCurrentUser();
+        if (!currentUser) return {};
+        // 只返回当前家庭的订单
+        const familyOrders = {};
+        for (let id in allOrders) {
+            if (allOrders[id].familyId === currentUser.familyId) {
+                familyOrders[id] = allOrders[id];
+            }
+        }
+        return familyOrders;
+    },
+
+    // 清空数据（测试用）
+    clearAll() {
+        localStorage.clear();
+    }
+};
+
+// ==================== UI 控制 ====================
+
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+
+    // 页面加载时的初始化
+    if (pageId === 'dashboardPage') {
+        updateDashboard();
+    } else if (pageId === 'recipesPage') {
+        loadRecipes();
+    } else if (pageId === 'ordersPage') {
+        loadOrders('today');
+    }
+}
+
+function showToast(message, duration = 2000) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, duration);
+}
+
+// ==================== 认证系统 ====================
+
+function switchAuthTab(tab) {
+    const tabs = document.querySelectorAll('.tabs .tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (tab === 'login') {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+    } else {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+    }
+}
+
+// 角色切换时显示不同的字段
+document.getElementById('regRole')?.addEventListener('change', function(e) {
+    const familyGroup = document.getElementById('familyNameGroup');
+    const inviteGroup = document.getElementById('inviteCodeGroup');
+
+    if (e.target.value === 'admin') {
+        familyGroup.classList.remove('hidden');
+        inviteGroup.classList.add('hidden');
+    } else {
+        familyGroup.classList.add('hidden');
+        inviteGroup.classList.remove('hidden');
+    }
+});
+
+function login() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!username || !password) {
+        showToast('请填写用户名和密码');
+        return;
+    }
+
+    const users = DB.getUsers();
+    const user = users[username];
+
+    if (user && user.password === password) {
+        DB.setCurrentUser(user);
+        showToast('登录成功！');
+        document.getElementById('userName').textContent = user.username;
+        showPage('dashboardPage');
+    } else {
+        showToast('用户名或密码错误');
+    }
+}
+
+function register() {
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const role = document.getElementById('regRole').value;
+    const familyName = document.getElementById('regFamilyName').value.trim();
+    const inviteCode = document.getElementById('regInviteCode').value.trim();
+
+    if (!username || !password) {
+        showToast('请填写用户名和密码');
+        return;
+    }
+
+    const users = DB.getUsers();
+    if (users[username]) {
+        showToast('用户名已存在');
+        return;
+    }
+
+    const userId = Date.now().toString();
+    let familyId, familyInviteCode;
+
+    if (role === 'admin') {
+        if (!familyName) {
+            showToast('请输入家庭名称');
+            return;
+        }
+        familyId = Date.now().toString();
+        familyInviteCode = Math.random().toString(36).substr(2, 8).toUpperCase();
+
+        const family = {
+            id: familyId,
+            name: familyName,
+            inviteCode: familyInviteCode,
+            createdBy: userId,
+            members: [userId]
+        };
+        DB.saveFamily(family);
+    } else {
+        if (!inviteCode) {
+            showToast('请输入邀请码');
+            return;
+        }
+        // 查找家庭
+        const families = DB.getFamilies();
+        let foundFamily = null;
+        for (let id in families) {
+            if (families[id].inviteCode === inviteCode) {
+                foundFamily = families[id];
+                break;
+            }
+        }
+        if (!foundFamily) {
+            showToast('邀请码无效');
+            return;
+        }
+        familyId = foundFamily.id;
+        foundFamily.members.push(userId);
+        DB.saveFamily(foundFamily);
+    }
+
+    const user = {
+        id: userId,
+        username,
+        password,
+        role,
+        familyId,
+        familyName: role === 'admin' ? familyName : null,
+        inviteCode: role === 'admin' ? familyInviteCode : null
+    };
+
+    DB.saveUser(user);
+    DB.setCurrentUser(user);
+
+    showToast('注册成功！请登录');
+    switchAuthTab('login');
+    document.getElementById('loginUsername').value = username;
+    document.getElementById('loginPassword').value = password;
+}
+
+function logout() {
+    localStorage.removeItem('currentUser');
+    showPage('loginPage');
+    showToast('已退出登录');
+}
+
+// ==================== 仪表盘 ====================
+
+function updateDashboard() {
+    const user = DB.getCurrentUser();
+    if (!user) return;
+
+    // 显示家庭信息
+    document.getElementById('familyName').textContent = user.familyName || '我的家庭';
+    document.getElementById('userName').textContent = `欢迎回来，${user.username}`;
+
+    // 显示邀请码
+    if (user.role === 'admin') {
+        document.getElementById('inviteCodeDisplay').textContent = user.inviteCode;
+    } else {
+        const families = DB.getFamilies();
+        const family = families[user.familyId];
+        if (family) {
+            document.getElementById('inviteCodeDisplay').textContent = family.inviteCode;
+        }
+    }
+
+    // 统计数据
+    const recipes = DB.getRecipes();
+    const orders = DB.getOrders();
+    const today = new Date().toISOString().split('T')[0];
+
+    const todayOrders = Object.values(orders).filter(o => o.orderDate === today);
+
+    document.getElementById('recipeCount').textContent = Object.keys(recipes).length;
+    document.getElementById('orderCount').textContent = todayOrders.length;
+
+    // 今日概览
+    const overviewEl = document.getElementById('todayOverview');
+    if (todayOrders.length === 0) {
+        overviewEl.innerHTML = '<p class="text-muted">暂无今日订单</p>';
+    } else {
+        const html = todayOrders.map(o => `
+            <div class="list-item">
+                <div class="list-item-content">
+                    <div class="list-item-title">${o.mealType} - ${o.recipeName}</div>
+                    <div class="list-item-subtitle">${o.notes || '无备注'}</div>
+                </div>
+                <span class="badge badge-${o.status === 'pending' ? 'pending' : o.status === 'ready' ? 'ready' : 'done'}">${o.status}</span>
+            </div>
+        `).join('');
+        overviewEl.innerHTML = html;
+    }
+}
+
+function copyInviteCode() {
+    const code = document.getElementById('inviteCodeDisplay').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('邀请码已复制');
+    });
+}
+
+// ==================== 菜谱管理 ====================
+
+function openRecipeModal(recipeId = null) {
+    const modal = document.getElementById('recipeModal');
+    modal.classList.add('active');
+
+    if (recipeId) {
+        const recipes = DB.getRecipes();
+        const recipe = recipes[recipeId];
+        if (recipe) {
+            document.getElementById('recipeName').value = recipe.name;
+            document.getElementById('recipeCategory').value = recipe.category;
+            document.getElementById('recipeIngredients').value = recipe.ingredients.map(i => `${i.name}:${i.amount}:${i.unit}`).join('\n');
+            document.getElementById('recipeSteps').value = recipe.steps.join('\n');
+            document.getElementById('recipeTime').value = recipe.cookTime;
+            document.getElementById('recipeDifficulty').value = recipe.difficulty;
+            modal.dataset.editId = recipeId;
+        }
+    } else {
+        // 清空表单
+        document.getElementById('recipeName').value = '';
+        document.getElementById('recipeIngredients').value = '';
+        document.getElementById('recipeSteps').value = '';
+        document.getElementById('recipeTime').value = '';
+        delete modal.dataset.editId;
+    }
+}
+
+function closeRecipeModal() {
+    document.getElementById('recipeModal').classList.remove('active');
+}
+
+function saveRecipe() {
+    const name = document.getElementById('recipeName').value.trim();
+    const category = document.getElementById('recipeCategory').value;
+    const ingredientsText = document.getElementById('recipeIngredients').value.trim();
+    const stepsText = document.getElementById('recipeSteps').value.trim();
+    const cookTime = document.getElementById('recipeTime').value;
+    const difficulty = document.getElementById('recipeDifficulty').value;
+
+    if (!name || !ingredientsText || !stepsText) {
+        showToast('请填写完整信息');
+        return;
+    }
+
+    // 解析食材
+    const ingredients = ingredientsText.split('\n').map(line => {
+        const [name, amount, unit] = line.split(':');
+        return { name: name.trim(), amount: amount?.trim(), unit: unit?.trim() };
+    }).filter(i => i.name);
+
+    // 解析步骤
+    const steps = stepsText.split('\n').filter(s => s.trim());
+
+    const recipe = {
+        name,
+        category,
+        ingredients,
+        steps,
+        cookTime: cookTime || '0',
+        difficulty
+    };
+
+    const modal = document.getElementById('recipeModal');
+    if (modal.dataset.editId) {
+        recipe.id = modal.dataset.editId;
+    }
+
+    DB.saveRecipe(recipe);
+    closeRecipeModal();
+    showToast('保存成功');
+
+    if (document.getElementById('recipesPage').classList.contains('active')) {
+        loadRecipes();
+    }
+}
+
+function loadRecipes() {
+    const recipes = DB.getRecipes();
+    const listEl = document.getElementById('recipeList');
+
+    if (Object.keys(recipes).length === 0) {
+        listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📖</div><p>暂无菜谱，点击右上角添加</p></div>';
+        return;
+    }
+
+    const html = Object.values(recipes).map(recipe => `
+        <div class="card">
+            <div class="card-title">${recipe.name}</div>
+            <div class="card-content">
+                <p><strong>分类：</strong>${recipe.category}</p>
+                <p><strong>时间：</strong>${recipe.cookTime}分钟 | <strong>难度：</strong>${recipe.difficulty}</p>
+                <p><strong>食材：</strong>${recipe.ingredients.map(i => i.name).join('、')}</p>
+            </div>
+            <div class="flex">
+                <button class="btn btn-secondary btn-small" onclick="openRecipeModal('${recipe.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteRecipe('${recipe.id}')">删除</button>
+            </div>
+        </div>
+    `).join('');
+
+    listEl.innerHTML = html;
+}
+
+function deleteRecipe(id) {
+    if (confirm('确定要删除这个菜谱吗？')) {
+        DB.deleteRecipe(id);
+        showToast('已删除');
+        loadRecipes();
+    }
+}
+
+function filterRecipes() {
+    const search = document.getElementById('recipeSearch').value.toLowerCase();
+    const filter = document.getElementById('recipeFilter').value;
+    const recipes = DB.getRecipes();
+
+    const filtered = Object.values(recipes).filter(r => {
+        const matchSearch = !search || r.name.toLowerCase().includes(search) ||
+                           r.ingredients.some(i => i.name.toLowerCase().includes(search));
+        const matchFilter = !filter || r.category === filter;
+        return matchSearch && matchFilter;
+    });
+
+    const listEl = document.getElementById('recipeList');
+    if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>没有找到匹配的菜谱</p></div>';
+        return;
+    }
+
+    const html = filtered.map(recipe => `
+        <div class="card">
+            <div class="card-title">${recipe.name}</div>
+            <div class="card-content">
+                <p><strong>分类：</strong>${recipe.category}</p>
+                <p><strong>时间：</strong>${recipe.cookTime}分钟 | <strong>难度：</strong>${recipe.difficulty}</p>
+                <p><strong>食材：</strong>${recipe.ingredients.map(i => i.name).join('、')}</p>
+            </div>
+            <div class="flex">
+                <button class="btn btn-secondary btn-small" onclick="openRecipeModal('${recipe.id}')">编辑</button>
+                <button class="btn btn-danger btn-small" onclick="deleteRecipe('${recipe.id}')">删除</button>
+            </div>
+        </div>
+    `).join('');
+
+    listEl.innerHTML = html;
+}
+
+// ==================== 点餐系统 ====================
+
+function openOrderModal() {
+    const modal = document.getElementById('orderModal');
+    modal.classList.add('active');
+
+    // 设置默认日期为今天
+    document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
+
+    // 加载菜谱列表
+    loadRecipeSelector();
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').classList.remove('active');
+}
+
+function loadRecipeSelector() {
+    const recipes = DB.getRecipes();
+    const selector = document.getElementById('recipeSelector');
+
+    if (Object.keys(recipes).length === 0) {
+        selector.innerHTML = '<div class="empty-state" style="padding: 20px;"><p>暂无菜谱，请先添加</p></div>';
+        return;
+    }
+
+    const html = Object.values(recipes).map(recipe => `
+        <div class="recipe-option" onclick="selectRecipe('${recipe.id}', this)">
+            <div class="list-item-title">${recipe.name}</div>
+            <div class="list-item-subtitle">${recipe.category} | ${recipe.cookTime}分钟</div>
+        </div>
+    `).join('');
+
+    selector.innerHTML = html;
+}
+
+let selectedRecipeId = null;
+
+function selectRecipe(id, element) {
+    document.querySelectorAll('.recipe-option').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedRecipeId = id;
+}
+
+function submitOrder() {
+    const orderDate = document.getElementById('orderDate').value;
+    const orderType = document.getElementById('orderType').value;
+    const notes = document.getElementById('orderNotes').value.trim();
+
+    if (!orderDate) {
+        showToast('请选择日期');
+        return;
+    }
+
+    if (!selectedRecipeId) {
+        showToast('请选择菜谱');
+        return;
+    }
+
+    const recipes = DB.getRecipes();
+    const recipe = recipes[selectedRecipeId];
+
+    const order = {
+        recipeId: selectedRecipeId,
+        recipeName: recipe.name,
+        orderDate: orderDate,
+        mealType: orderType,
+        notes: notes
+    };
+
+    DB.saveOrder(order);
+    closeOrderModal();
+    showToast('点餐成功！');
+
+    // 重置选择
+    selectedRecipeId = null;
+    document.getElementById('orderNotes').value = '';
+
+    if (document.getElementById('ordersPage').classList.contains('active')) {
+        loadOrders('today');
+    }
+
+    updateDashboard();
+}
+
+function loadOrders(type = 'today') {
+    const orders = DB.getOrders();
+    const listEl = document.getElementById('orderList');
+
+    let filteredOrders = Object.values(orders);
+    const today = new Date().toISOString().split('T')[0];
+
+    if (type === 'today') {
+        filteredOrders = filteredOrders.filter(o => o.orderDate === today);
+    } else {
+        filteredOrders = filteredOrders.filter(o => o.orderDate < today);
+    }
+
+    // 按日期倒序
+    filteredOrders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+    if (filteredOrders.length === 0) {
+        listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>暂无订单</p></div>';
+        return;
+    }
+
+    const html = filteredOrders.map(order => `
+        <div class="card">
+            <div class="card-title">${order.orderDate} ${order.mealType}</div>
+            <div class="card-content">
+                <p><strong>菜谱：</strong>${order.recipeName}</p>
+                <p><strong>备注：</strong>${order.notes || '无'}</p>
+                <div class="card-meta">
+                    <span>下单人：${order.userId === DB.getCurrentUser().id ? '我' : '家人'}</span>
+                    <span class="badge badge-${order.status === 'pending' ? 'pending' : order.status === 'ready' ? 'ready' : 'done'}">${order.status}</span>
+                </div>
+            </div>
+            ${order.status === 'pending' && order.userId === DB.getCurrentUser().id ? `
+            <div class="flex">
+                <button class="btn btn-success btn-small" onclick="changeOrderStatus('${order.id}', 'ready')">标记准备完成</button>
+                <button class="btn btn-secondary btn-small" onclick="changeOrderStatus('${order.id}', 'done')">标记已完成</button>
+            </div>
+            ` : ''}
+        </div>
+    `).join('');
+
+    listEl.innerHTML = html;
+}
+
+function switchOrderTab(type) {
+    const tabs = document.querySelectorAll('#ordersPage .tabs .tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    loadOrders(type);
+}
+
+function changeOrderStatus(orderId, status) {
+    const orders = DB.getOrders();
+    if (orders[orderId]) {
+        orders[orderId].status = status;
+        localStorage.setItem('orders', JSON.stringify(orders));
+        showToast('状态已更新');
+        loadOrders('today');
+        updateDashboard();
+    }
+}
+
+// ==================== 初始化 ====================
+
+window.onload = function() {
+    // 检查是否已登录
+    const currentUser = DB.getCurrentUser();
+    if (currentUser) {
+        showPage('dashboardPage');
+    } else {
+        showPage('loginPage');
+    }
+
+    // 演示数据（如果为空）
+    if (Object.keys(DB.getUsers()).length === 0) {
+        // 创建演示用户
+        const demoUser = {
+            id: 'demo1',
+            username: 'demo',
+            password: '123456',
+            role: 'admin',
+            familyId: 'demoFamily',
+            familyName: '演示家庭',
+            inviteCode: 'DEMO888'
+        };
+
+        const demoFamily = {
+            id: 'demoFamily',
+            name: '演示家庭',
+            inviteCode: 'DEMO888',
+            createdBy: 'demo1',
+            members: ['demo1']
+        };
+
+        const demoRecipe = {
+            id: 'demoRecipe1',
+            name: '西红柿炒鸡蛋',
+            category: '午餐',
+            ingredients: [
+                {name: '西红柿', amount: '2', unit: '个'},
+                {name: '鸡蛋', amount: '3', unit: '个'}
+            ],
+            steps: ['西红柿切块', '鸡蛋打散', '先炒鸡蛋再炒西红柿', '混合炒匀'],
+            cookTime: '15',
+            difficulty: '简单',
+            familyId: 'demoFamily'
+        };
+
+        const demoOrder = {
+            id: 'demoOrder1',
+            recipeId: 'demoRecipe1',
+            recipeName: '西红柿炒鸡蛋',
+            orderDate: new Date().toISOString().split('T')[0],
+            mealType: '午餐',
+            notes: '少油',
+            status: 'pending',
+            userId: 'demo1',
+            familyId: 'demoFamily',
+            createdAt: new Date().toISOString()
+        };
+
+        DB.saveUser(demoUser);
+        DB.saveFamily(demoFamily);
+        DB.saveRecipe(demoRecipe);
+        DB.saveOrder(demoOrder);
+
+        showToast('已创建演示账号：demo / 密码：123456', 3000);
+    }
+};
+</script>
+
+</body>
+</html>
